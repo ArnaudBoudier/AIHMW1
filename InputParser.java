@@ -1,3 +1,4 @@
+
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -7,15 +8,17 @@ import java.util.regex.Pattern;
  */
 public class InputParser {
 
-    public int nbState = 0;
+    public int nbStates = 0;
     public Matrix transitionMatrix;
 
-    public int nbObservation = 0;
+    public int nbTypeObservations = 0;
     public Matrix emissionMatrix;
 
     public Matrix pi;
-
-
+    
+    public int nbObservations = 0;
+    public Matrix observations;
+    
     private String transitionMatrixString = "";
 
     public InputParser(Scanner input) {
@@ -25,13 +28,13 @@ public class InputParser {
         /*
          * Process first line : transition matrix
          */
-        String transitionLine = input.nextLine();
-        Matcher transitionMatcher = pattern.matcher(transitionLine);
+        String observationLine = input.nextLine();
+        Matcher transitionMatcher = pattern.matcher(observationLine);
 
         if (transitionMatcher.matches()) {
-            this.nbState = Integer.parseInt(transitionMatcher.group(1));
+            this.nbStates = Integer.parseInt(transitionMatcher.group(1));
             String transitionMatrixString = transitionMatcher.group(3);
-            this.transitionMatrix = new Matrix(this.nbState, transitionMatrixString);
+            this.transitionMatrix = new Matrix(this.nbStates, transitionMatrixString);
         }
 
         /*
@@ -41,9 +44,9 @@ public class InputParser {
         Matcher emissionMatcher = pattern.matcher(emissionLine);
 
         if (emissionMatcher.matches()) {
-            this.nbObservation = Integer.parseInt(emissionMatcher.group(2));
+            this.nbTypeObservations = Integer.parseInt(emissionMatcher.group(2));
             String emissionMatrixString = emissionMatcher.group(3);
-            this.emissionMatrix = new Matrix(this.nbObservation, emissionMatrixString);
+            this.emissionMatrix = new Matrix(this.nbTypeObservations, emissionMatrixString);
         }
 
         /*
@@ -54,25 +57,25 @@ public class InputParser {
 
         if (piMatcher.matches()) {
             String piString = piMatcher.group(3);
-            for (int i=0; i<nbState; i++) {
-                this.pi = new Matrix(1, piString);
-            }
+            this.pi = new Matrix(nbStates, piString);
         }
 
         /*
          * Process fourth line if exists : observation sequence
          */
-        /*
-        String transitionLine = input.nextLine();
-        Matcher transitionMatcher = pattern.matcher(transitionLine);
+ 
+        observationLine = input.nextLine();
+        
+        Pattern patternObs = Pattern.compile("(\\d+) (.*)");
+        Matcher observationMatcher = patternObs.matcher(observationLine);
 
-        if (transitionMatcher.matches()) {
-            this.nbStates = Integer.parseInt(transitionMatcher.group(1));
-            String transitionMatrixString = transitionMatcher.group(3);
-            this.transitionMatrix = new Matrix(this.nbStates, transitionMatrixString);
+        
+        if (observationMatcher.matches()) {
+            this.nbObservations = Integer.parseInt(observationMatcher.group(1));
+            String observationsMatrixString = observationMatcher.group(2);
+            this.observations = new Matrix(1, observationsMatrixString);
         }
-        */
-
+         
     }
 
 }
