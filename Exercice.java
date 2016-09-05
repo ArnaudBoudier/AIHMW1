@@ -7,7 +7,8 @@ import java.util.Scanner;
  * and open the template in the editor.
  */
 /**
- *
+ * Abstract classe use for exercice resolution, when you begin a new exercice, you juste have to
+ * create a new classe which extends this classe. Then you have acces to the data parsed easily.
  * @author Arnaud
  */
 public abstract class Exercice {

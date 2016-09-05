@@ -8,11 +8,13 @@ public class Main {
     public static void main(String[] args) {
         Exercice ex = null;
         // Exercice answer for the Next Observation Distribution
-//         ex = new NextObsDisExercice();
-       
-        
+        // ex = new NextObsDisExercice();
+      
         // Exercice answer for the Probability of the observation sequence
-        ex = new ProbObsSeqExercice();
+        // ex = new ProbObsSeqExercice();
+        
+        // New exercice ? 
+        
         
          ex.resolve();
     }
