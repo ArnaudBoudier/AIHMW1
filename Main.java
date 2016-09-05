@@ -11,7 +11,7 @@ public class Main
 {
 
     public static void main(String[] args) {
-
+        
         Pattern pattern = Pattern.compile("(\\d+) (\\d+) (.*)");
         Scanner input = new Scanner(System.in);
 
