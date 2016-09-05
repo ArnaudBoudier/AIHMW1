@@ -1,5 +1,4 @@
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,8 +11,17 @@ public class Main
 
     public static void main(String[] args) {
 
-        Pattern pattern = Pattern.compile("(\\d+) (\\d+) (.*)");
+        Scanner inputText = new Scanner(System.in);
+
+        InputParser input = new InputParser(inputText);
+
+        System.out.println(input.nbObservation+"  "+input.nbState);
+
+        /*
         Scanner input = new Scanner(System.in);
+
+        Pattern pattern = Pattern.compile("(\\d+) (\\d+) (.*)");
+
 
         int nbStates = 0;
         int nbObservations = 0;
@@ -38,6 +46,7 @@ public class Main
             System.out.println();
         }
         */
+        /*
 
         BigDecimal[][] transition = stringToBigDecimalMatrix(transform(transitionMatrixString.split(" "), nbStates));
         String emissionLine = input.nextLine();
@@ -65,6 +74,8 @@ public class Main
 
         BigDecimal[][] piNorm = new BigDecimal[1][nbStates];
         piNorm[0] = pi;
+*/
+
 /*
         for (int i = 0; i < emission.length; i++) {
             for (int j = 0; j < emission[i].length; j++) {
@@ -79,6 +90,8 @@ public class Main
             System.out.println();
         }
 */
+
+/*
         BigDecimal[][] abProduct = multiplyByMatrix(transition, emission);
         BigDecimal[][] emissionProb = multiplyByMatrix(piNorm, abProduct);
 
@@ -87,8 +100,10 @@ public class Main
             System.out.print(b+" ");
         }
         System.out.println();
-    }
 
+*/
+    }
+/*
     static String[][] transform(String[] arr, int N) {
         int M = (arr.length + N - 1) / N;
         String[][] mat = new String[M][];
@@ -138,5 +153,5 @@ public class Main
         }
         return result;
     }
-
+*/
 }
