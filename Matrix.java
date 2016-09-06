@@ -72,8 +72,8 @@ public class Matrix {
 
     // Get a column of a matrix has a table
     public double[] getCol(int colValue) {
-        double[] col = new double[nbRows];
-        for (int i = 0; i < nbRows; i++) {
+        double[] col = new double[nbCol];
+        for (int i = 0; i < nbCol; i++) {
             col[i] = matrix[i][colValue];
         }
         return col;
@@ -95,7 +95,7 @@ public class Matrix {
         int m1ColLength = m1[0].length; // m1 columns length
         int m2RowLength = m2.length;    // m2 rows length
         if (m1ColLength != m2RowLength) {
-            System.err.println("Matrix multiplication is not possible");
+            System.err.println("matrix multiplication is not possible");
            System.exit(0); // matrix multiplication is not possible
         }
         int mRRowLength = m1.length;    // m result rows length

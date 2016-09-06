@@ -11,11 +11,9 @@ public class Main {
         // ex = new NextObsDisExercice();
       
         // Exercice answer for the Probability of the observation sequence
-        // ex = new ProbObsSeqExercice();
+         ex = new ProbObsSeqExercice();
         
         // New exercice ? 
-        
-        
          ex.resolve();
     }
 }
