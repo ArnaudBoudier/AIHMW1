@@ -15,11 +15,11 @@ public class EstiModParamExercice extends Exercice {
     @Override
     public void resolve() {
         int iters = 0;
-        int itersMax = 5;
+        int itersMax = 1005;
         double oldLogProb = Double.NEGATIVE_INFINITY;
         double logProb = 0;
         boolean isFirstIteration = true;
-        while (iters < itersMax && oldLogProb < logProb) {
+        while (iters < itersMax) {
             if (!isFirstIteration) {
                 oldLogProb = logProb;
             }
@@ -68,10 +68,12 @@ public class EstiModParamExercice extends Exercice {
                 ctValues[t] = ct;
                 for (int i = 0; i < data.nbStates; i++) {
                     alphas_t[i] *= ct;
+                   
                 }
                 // t_m1 = t for next iteration
                 for (int i = 0; i < data.nbStates; i++) {
                     alphas_tm1[i] = alphas_t[i];
+                    
                 }
                 listAlpha.add(alphas);
             }
@@ -94,7 +96,7 @@ public class EstiModParamExercice extends Exercice {
                 for (int i = 0; i < data.nbStates; i++) {
                     betas_t[i] = 0;
                     for (int j = 0; j < data.nbStates; j++) {
-                        betas_t[i] += (data.transitionMatrix.matrix[i][j] * data.emissionMatrix.matrix[j][(int) observation_TP1] * betas_tP1[j]);
+                        betas_t[i] +=(data.transitionMatrix.matrix[i][j] * data.emissionMatrix.matrix[j][(int) observation_TP1] * betas_tP1[j]);
                     }
                     betas_t[i] *= ctValues[t];
                 }
@@ -116,11 +118,16 @@ public class EstiModParamExercice extends Exercice {
             for (int t = 0; t < data.nbObservations - 1; t++) {
                 double denom = 0;
                 double ob_TP1 = data.observations.matrix[t + 1][0];
+                for (int i = 0; i < data.nbStates;i++){
+                    denom+=listAlpha.get(data.nbObservations-1)[i];
+                }
+                /*
                 for (int i = 0; i < data.nbStates; i++) {
                     for (int j = 0; j < data.nbStates; j++) {
                         denom += (listAlpha.get(t)[i] * data.transitionMatrix.matrix[i][j] * data.emissionMatrix.matrix[j][(int) ob_TP1] * listBetas.get(t + 1)[j]);
                     }
                 }
+                */
                 for (int i = 0; i < data.nbStates; i++) {
                     gama_t[i] = 0;
                     for (int j = 0; j < data.nbStates; j++) {
