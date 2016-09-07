@@ -13,9 +13,9 @@ public class Main {
         // Exercice answer for the Probability of the observation sequence
         // ex = new ProbObsSeqExercice();
         
-        // New exercice ? 
-        
-        
-         ex.resolve();
+        // Exercice answer for the most likely sequence of states given the observations
+        ex = new MostLikelySequenceOfStates();
+
+        ex.resolve();
     }
 }

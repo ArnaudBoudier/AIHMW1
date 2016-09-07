@@ -61,6 +61,7 @@ public class Matrix {
             }
             System.out.println();
         }
+        System.out.println();
     }
 
     // Display Fonction for matrix
@@ -96,7 +97,7 @@ public class Matrix {
         int m2RowLength = m2.length;    // m2 rows length
         if (m1ColLength != m2RowLength) {
             System.err.println("Matrix multiplication is not possible");
-           System.exit(0); // matrix multiplication is not possible
+            System.exit(0); // matrix multiplication is not possible
         }
         int mRRowLength = m1.length;    // m result rows length
         int mRColLength = m2[0].length; // m result columns length
