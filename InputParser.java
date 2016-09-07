@@ -19,7 +19,7 @@ public class InputParser {
     public int nbObservations = 0;
     public Matrix observations;
     
-    private String transitionMatrixString = "";
+//    private String transitionMatrixString = "";
 
     public InputParser(Scanner input) {
 

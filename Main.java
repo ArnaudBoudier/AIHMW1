@@ -23,6 +23,11 @@ public class Main {
          System.out.println("valeur b " + b);
          */
        
+        // ex = new ProbObsSeqExercice();
+        
+        // Exercice answer for the most likely sequence of states given the observations
+       // ex = new MostLikelySequenceOfStates();
+
         ex.resolve();
     }
 }
