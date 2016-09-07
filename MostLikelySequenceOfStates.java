@@ -40,7 +40,7 @@ public class MostLikelySequenceOfStates extends Exercice {
 */
         finalStateSequence[data.nbObservations - 1] = finalState;
 
-        for (int t=data.nbObservations-2; t>0; t--) {
+        for (int t=data.nbObservations-2; t>=0; t--) {
             // System.out.println("t : "+t+", finalStateSeq[t+1] : "+finalStateSequence[t+1]);
             // System.out.println("result : "+deltaIndex [finalStateSequence[t+1]] [t+1]);
             finalStateSequence[t] = deltaIndex [finalStateSequence[t+1]] [t+1];
