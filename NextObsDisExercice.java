@@ -13,8 +13,8 @@ public class NextObsDisExercice extends Exercice {
     @Override
     public void resolve() {
 
-        double[][] abProduct = Matrix.multiplyByMatrix(data.transitionMatrix.matrix, data.emissionMatrix.matrix);
-        double[][] emissionProb = Matrix.multiplyByMatrix(data.pi.matrix, abProduct);
+        double[][] abProduct = Matrix.multiplyByMatrixUsingLog(data.transitionMatrix.matrix, data.emissionMatrix.matrix);
+        double[][] emissionProb = Matrix.multiplyByMatrixUsingLog(data.pi.matrix, abProduct);
 
         System.out.print("1 " + data.nbTypeObservations + " ");
         for (double b : emissionProb[0]) {
