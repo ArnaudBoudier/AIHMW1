@@ -55,11 +55,12 @@ public class Matrix {
 
     // Display Fonction for matrix
     public static void printMatrix(double[][] matrix) {
+        System.out.print(matrix.length + " " + matrix[0].length + " ");
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[i].length; j++) {
                 System.out.print(matrix[i][j] + " ");
             }
-            System.out.println();
+
         }
         System.out.println();
     }
@@ -80,36 +81,6 @@ public class Matrix {
         return col;
     }
 
-    public static double[] logVectorTraduction(double[] vector) {
-        for (int i = 0; i < vector.length; i++) {
-            vector[i] = Math.exp(vector[i]);
-        }
-        return vector;
-    }
-
-    public static double[][] logMatriceTraduction(double[][] matrice) {
-        for (int i = 0; i < matrice.length; i++) {
-            for (int j = 0; j < matrice[0].length; j++) {
-                matrice[i][j] = Math.exp(matrice[i][j]);
-            }
-        }
-        return matrice;
-    }
-
-    public static double[] vectorialProductUsingLog(double[] m1, double[] m2) {
-        if (m1.length != m2.length) {
-            System.err.println("m1 and m2 have a different dimension");
-            System.exit(0);
-        }
-        double[] res = new double[m1.length];
-        for (int i = 0; i < m1.length; i++) {
-            double a = Math.log(m1[i]);
-            double b = Math.log(m2[i]);
-            res[i] = Math.exp(a + b);
-        }
-        return res;
-    }
-
     public static double[] vectorialProduct(double[] m1, double[] m2) {
         if (m1.length != m2.length) {
             System.err.println("m1 and m2 have a different dimension");
@@ -120,30 +91,6 @@ public class Matrix {
             res[i] = m1[i] * m2[i];
         }
         return res;
-    }
-
-    public static double[][] multiplyByMatrixUsingLog(double[][] m1, double[][] m2) {
-        int m1ColLength = m1[0].length; // m1 columns length
-        int m2RowLength = m2.length;    // m2 rows length
-        if (m1ColLength != m2RowLength) {
-            System.err.println("matrix multiplication is not possible");
-            System.exit(0); // matrix multiplication is not possible
-        }
-        int mRRowLength = m1.length;    // m result rows length
-        int mRColLength = m2[0].length; // m result columns length
-
-        double[][] mResult = new double[mRRowLength][mRColLength];
-
-        for (int i = 0; i < mRRowLength; i++) {         // rows from m1
-            for (int j = 0; j < mRColLength; j++) {     // columns from m2
-                for (int k = 0; k < m1ColLength; k++) { // columns from m1
-                    double arg1 = Math.log(m1[i][k]);
-                    double arg2 = Math.log(m2[k][j]);
-                    mResult[i][j] += Math.exp(arg1 + arg2);
-                }
-            }
-        }
-        return mResult;
     }
 
     public static double[][] multiplyByMatrix(double[][] m1, double[][] m2) {
