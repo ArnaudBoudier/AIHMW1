@@ -15,15 +15,11 @@ public class EstiModParamExercice extends Exercice {
     @Override
     public void resolve() {
         int iters = 0;
-        int itersMax = 300;
+        int itersMax = 50;
         double oldLogProb = Double.NEGATIVE_INFINITY;
         double logProb = 0;
-        boolean isFirstIteration = true;
         while (iters < itersMax) {
-            if (!isFirstIteration) {
-                oldLogProb = logProb;
-            }
-            isFirstIteration = false;
+          
             ///////// FORWARD ALGORITHM //////////////
             double[] alphas = new double[data.nbStates];
             ArrayList<double[]> listAlpha = new ArrayList<>();
@@ -151,13 +147,18 @@ public class EstiModParamExercice extends Exercice {
                 logProb += Math.log(ctValues[t]);
             }
             logProb = -logProb;
-
-            if (oldLogProb > logProb) {
+            // If we have reached the convergence point or iter == iterMAx
+            iters++;
+            if (oldLogProb > logProb || iters ==itersMax) {
                 Matrix.printMatrix(data.transitionMatrix.matrix);
                 Matrix.printMatrix(data.emissionMatrix.matrix);
                 break;
             }
             oldLogProb = logProb;
+            
+           
+            
+            
             // RE estimation de PI
             for (int i = 0; i < data.nbStates; i++) {
                 data.pi.matrix[0][i] = listGama.get(0)[i];
@@ -192,7 +193,7 @@ public class EstiModParamExercice extends Exercice {
                     data.emissionMatrix.matrix[i][j] = numer / denom;
                 }
             }
-            iters++;
+       
         }
 
     }
