@@ -15,7 +15,7 @@ public class EstiModParamExercice extends Exercice {
     @Override
     public void resolve() {
         int iters = 0;
-        int itersMax = 5;
+        int itersMax = 300;
         double oldLogProb = Double.NEGATIVE_INFINITY;
         double logProb = 0;
         boolean isFirstIteration = true;
@@ -137,10 +137,27 @@ public class EstiModParamExercice extends Exercice {
                     }
                 }
 
-                listDiGama.add(digama_t.clone());
+                double[][] diGamaCopy = new double[digama_t.length][];
+                for (int i = 0; i < digama_t.length; i++) {
+                    diGamaCopy[i] = digama_t[i].clone();
+                }
+                listDiGama.add(diGamaCopy);
                 listGama.add(gama_t.clone());
             }
 
+            /////// Calcul of P(O\lambda)
+            logProb = 0;
+            for (int t = 0; t < data.nbObservations; t++) {
+                logProb += Math.log(ctValues[t]);
+            }
+            logProb = -logProb;
+
+            if (oldLogProb > logProb) {
+                Matrix.printMatrix(data.transitionMatrix.matrix);
+                Matrix.printMatrix(data.emissionMatrix.matrix);
+                break;
+            }
+            oldLogProb = logProb;
             // RE estimation de PI
             for (int i = 0; i < data.nbStates; i++) {
                 data.pi.matrix[0][i] = listGama.get(0)[i];
@@ -175,18 +192,6 @@ public class EstiModParamExercice extends Exercice {
                     data.emissionMatrix.matrix[i][j] = numer / denom;
                 }
             }
-
-            /////// Calcul of P(O\lambda)
-            logProb = 0;
-            for (int t = 0; t < data.nbObservations; t++) {
-                logProb += Math.log(ctValues[t]);
-            }
-            logProb = -logProb;
-
-            System.out.println("MATRICE TRANS ESTIMATED AT T = " + iters);
-            Matrix.printMatrix(data.transitionMatrix.matrix);
-            System.out.println("MATRICE EMI ESTIMATED AT T = " + iters);
-            Matrix.printMatrix(data.emissionMatrix.matrix);
             iters++;
         }
 
