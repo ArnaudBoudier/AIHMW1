@@ -21,7 +21,14 @@ public class Matrix {
             }
         }
     }
-
+    
+     public Matrix(double[][] matrixValues) {
+         this.matrix = matrixValues;
+         this.nbRows = matrixValues.length;
+         this.nbCol = matrixValues[0].length;
+     }
+    
+    
     // Matrix creation with String 
     public Matrix(int nbRows, String matrixString) {
         this.matrix = stringTodoubleMatrix(transform(matrixString.split(" "), nbRows));
@@ -47,7 +54,12 @@ public class Matrix {
         double[][] result = new double[n][m];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
+                try {
                 result[i][j] = Double.parseDouble(matrix[i][j]);
+                }
+                catch (Exception e){
+                    System.out.println("");
+                }
             }
         }
         return result;

@@ -15,12 +15,11 @@ public class InputParser {
     public Matrix emissionMatrix;
 
     public Matrix pi;
-    
+
     public int nbObservations = 0;
     public Matrix observations;
-    
-//    private String transitionMatrixString = "";
 
+//    private String transitionMatrixString = "";
     public InputParser(Scanner input) {
 
         Pattern pattern = Pattern.compile("(\\d+) (\\d+) (.*)");
@@ -63,19 +62,69 @@ public class InputParser {
         /*
          * Process fourth line if exists : observation sequence
          */
- 
         observationLine = input.nextLine();
-        
+
         Pattern patternObs = Pattern.compile("(\\d+) (.*)");
         Matcher observationMatcher = patternObs.matcher(observationLine);
 
-        
         if (observationMatcher.matches()) {
             this.nbObservations = Integer.parseInt(observationMatcher.group(1));
             String observationsMatrixString = observationMatcher.group(2);
             this.observations = new Matrix(1, observationsMatrixString);
         }
-         
+    }
+
+    public InputParser(Scanner input, double[][] transitionMatrix, double[][] emissionMatrix, double[] pi, int nbStates, int nbTypeObservations) {
+
+        this.transitionMatrix = new Matrix(transitionMatrix);
+
+        this.emissionMatrix = new Matrix(emissionMatrix);
+
+        this.pi = new Matrix(1, pi.length, pi);
+
+        this.nbStates = nbStates;
+
+        this.nbTypeObservations = nbTypeObservations;
+
+        String observationLine = input.nextLine();
+
+        Pattern patternObs = Pattern.compile("(\\d+) (.*)");
+        Matcher observationMatcher = patternObs.matcher(observationLine);
+
+        if (observationMatcher.matches()) {
+            this.nbObservations = Integer.parseInt(observationMatcher.group(1));
+            String observationsMatrixString = observationMatcher.group(2);
+            this.observations = new Matrix(1, observationsMatrixString);
+        }
+
+    }
+
+    public void setEmissionMatrix(Matrix emissionMatrix) {
+        this.emissionMatrix = emissionMatrix;
+    }
+
+    public void setNbObservations(int nbObservations) {
+        this.nbObservations = nbObservations;
+    }
+
+    public void setNbStates(int nbStates) {
+        this.nbStates = nbStates;
+    }
+
+    public void setNbTypeObservations(int nbTypeObservations) {
+        this.nbTypeObservations = nbTypeObservations;
+    }
+
+    public void setObservations(Matrix observations) {
+        this.observations = observations;
+    }
+
+    public void setPi(Matrix pi) {
+        this.pi = pi;
+    }
+
+    public void setTransitionMatrix(Matrix transitionMatrix) {
+        this.transitionMatrix = transitionMatrix;
     }
 
 }

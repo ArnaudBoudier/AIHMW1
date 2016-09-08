@@ -6,18 +6,25 @@ public class Main {
 
     public static void main(String[] args) {
         Exercice ex = null;
-        // Exercice answer for the Next Observation Distribution
+        // GRADE E AND D
+        // 1. Exercice answer for the Next Observation Distribution
         // ex = new NextObsDisExercice();
 
-        // Exercice answer for the Probability of the observation sequence
+        // 2. Exercice answer for the Probability of the observation sequence
         // ex = new ProbObsSeqExercice();
-        // Exercice EstiModeParamService
-         ex = new EstiModParamExercice();
-      
         
-        // Exercice answer for the most likely sequence of states given the observations
-       // ex = new MostLikelySequenceOfStates();
-
+        // 3. Exercice answer for the most likely sequence of states given the observations
+        // ex = new MostLikelySequenceOfStates();
+        
+        // 4. Exercice EstiModeParamService
+        // ex = new EstiModParamExercice();
+        
+        
+        // GRADE C
+        // C 1. QUESTION 7
+        ex = new PartCQuestions78910();
+        
+        
         ex.resolve();
     }
 }

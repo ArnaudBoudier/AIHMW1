@@ -23,6 +23,13 @@ public abstract class Exercice {
         Scanner input = new Scanner(System.in);
         this.data = new InputParser(input);
     }
+    /*
+    public Exercice(double[][] transitionMatrix, double[][] emissionMatrix, double[] pi, int nbStates, int nbTypeObservations) {
+        Scanner input = new Scanner(System.in);
+        this.data = new InputParser(input, transitionMatrix, emissionMatrix, pi, nbStates, nbTypeObservations);
+    
+    }
+      */
     // Abstract Function which resolve the exercice
     public abstract void resolve();
 
