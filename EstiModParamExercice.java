@@ -15,7 +15,7 @@ public class EstiModParamExercice extends Exercice {
     @Override
     public void resolve() {
         int iters = 0;
-        int itersMax = 1005;
+        int itersMax = 5;
         double oldLogProb = Double.NEGATIVE_INFINITY;
         double logProb = 0;
         boolean isFirstIteration = true;
@@ -42,7 +42,7 @@ public class EstiModParamExercice extends Exercice {
                 alphas[i] *= c0;
             }
 
-            listAlpha.add(alphas);
+            listAlpha.add(alphas.clone());
             // Compute of alpha_t(i)
             // Initialisation part
             double[] alphas_tm1 = new double[data.nbStates];
@@ -68,14 +68,14 @@ public class EstiModParamExercice extends Exercice {
                 ctValues[t] = ct;
                 for (int i = 0; i < data.nbStates; i++) {
                     alphas_t[i] *= ct;
-                   
+
                 }
                 // t_m1 = t for next iteration
                 for (int i = 0; i < data.nbStates; i++) {
                     alphas_tm1[i] = alphas_t[i];
-                    
+
                 }
-                listAlpha.add(alphas);
+                listAlpha.add(alphas_t.clone());
             }
 
             ///////// END FORWARD ALGORITHM //////////////
@@ -89,14 +89,14 @@ public class EstiModParamExercice extends Exercice {
             for (int i = 0; i < data.nbStates; i++) {
                 betas_tP1[i] = ctValues[data.nbObservations - 1];
             }
-            listBetas.add(0, betas_tP1);
+            listBetas.add(0, betas_tP1.clone());
             // Beta Pass
             for (int t = data.nbObservations - 2; t >= 0; t--) {
                 double observation_TP1 = data.observations.matrix[t + 1][0];
                 for (int i = 0; i < data.nbStates; i++) {
                     betas_t[i] = 0;
                     for (int j = 0; j < data.nbStates; j++) {
-                        betas_t[i] +=(data.transitionMatrix.matrix[i][j] * data.emissionMatrix.matrix[j][(int) observation_TP1] * betas_tP1[j]);
+                        betas_t[i] += (data.transitionMatrix.matrix[i][j] * data.emissionMatrix.matrix[j][(int) observation_TP1] * betas_tP1[j]);
                     }
                     betas_t[i] *= ctValues[t];
                 }
@@ -104,7 +104,7 @@ public class EstiModParamExercice extends Exercice {
                 for (int i = 0; i < data.nbStates; i++) {
                     betas_tP1[i] = betas_t[i];
                 }
-                listBetas.add(0, betas_t);
+                listBetas.add(0, betas_t.clone());
             }
 
             ///////// END BACKWARD ALGORITHM //////////////
@@ -118,16 +118,17 @@ public class EstiModParamExercice extends Exercice {
             for (int t = 0; t < data.nbObservations - 1; t++) {
                 double denom = 0;
                 double ob_TP1 = data.observations.matrix[t + 1][0];
-                for (int i = 0; i < data.nbStates;i++){
-                    denom+=listAlpha.get(data.nbObservations-1)[i];
-                }
                 /*
+                for (int i = 0; i < data.nbStates; i++) {
+                    denom += listAlpha.get(data.nbObservations - 1)[i];
+                }
+                 */
                 for (int i = 0; i < data.nbStates; i++) {
                     for (int j = 0; j < data.nbStates; j++) {
                         denom += (listAlpha.get(t)[i] * data.transitionMatrix.matrix[i][j] * data.emissionMatrix.matrix[j][(int) ob_TP1] * listBetas.get(t + 1)[j]);
                     }
                 }
-                */
+
                 for (int i = 0; i < data.nbStates; i++) {
                     gama_t[i] = 0;
                     for (int j = 0; j < data.nbStates; j++) {
@@ -136,8 +137,8 @@ public class EstiModParamExercice extends Exercice {
                     }
                 }
 
-                listDiGama.add(digama_t);
-                listGama.add(gama_t);
+                listDiGama.add(digama_t.clone());
+                listGama.add(gama_t.clone());
             }
 
             // RE estimation de PI
