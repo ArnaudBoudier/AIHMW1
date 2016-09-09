@@ -14,7 +14,7 @@ public class Main {
         // ex = new ProbObsSeqExercice();
         
         // 3. Exercice answer for the most likely sequence of states given the observations
-        // ex = new MostLikelySequenceOfStates();
+         ex = new MostLikelySequenceOfStates();
         
         // 4. Exercice EstiModeParamService
         // ex = new EstiModParamExercice();
@@ -22,7 +22,7 @@ public class Main {
         
         // GRADE C
         // C 1. QUESTION 7
-        ex = new PartCQuestions78910();
+       // ex = new PartCQuestions78910();
         
         
         ex.resolve();
