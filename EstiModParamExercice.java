@@ -19,19 +19,18 @@ public class EstiModParamExercice extends Exercice {
     @Override
     public void resolve() {
 
-        BaumWelchAlgorithm(data.transitionMatrix.matrix, data.emissionMatrix.matrix, data.pi.matrix, data.observations.matrix,50);
+        BaumWelchAlgorithm(data.transitionMatrix.matrix, data.emissionMatrix.matrix, data.pi.matrix, data.observations.matrix, 50,data.nbObservations);
     }
 
-    public static void BaumWelchAlgorithm(double[][] transitionMatrix, double[][] emissionMatrix, double[][] pi, double[][] observations, int iterMax) {
+    public static void BaumWelchAlgorithm(double[][] transitionMatrix, double[][] emissionMatrix, double[][] pi, double[][] observations, int iterMax,int nbObservations) {
 
-        // Initialisation of parameters
+        // Initialization of parameters
         int nbStates = transitionMatrix.length;
-        int nbObservations = observations.length;
         int nbTypeObservations = emissionMatrix[0].length;
 
         // Begin of Baum Welch Algorithm
         int iters = 0;
-     
+
         double oldLogProb = Double.NEGATIVE_INFINITY;
         double logProb = 0;
 
@@ -40,7 +39,6 @@ public class EstiModParamExercice extends Exercice {
             ///////// FORWARD ALGORITHM //////////////
             double[] alphas = new double[nbStates];
             ArrayList<double[]> listAlpha = new ArrayList<>();
-            //double oldProb = Math.
 
             // Compute alpha 0;
             double c0 = 0;
@@ -131,11 +129,6 @@ public class EstiModParamExercice extends Exercice {
             for (int t = 0; t < nbObservations - 1; t++) {
                 double denom = 0;
                 double ob_TP1 = observations[t + 1][0];
-                /*
-                for (int i = 0; i < nbStates; i++) {
-                    denom += listAlpha.get(nbObservations - 1)[i];
-                }
-                 */
                 for (int i = 0; i < nbStates; i++) {
                     for (int j = 0; j < nbStates; j++) {
                         denom += (listAlpha.get(t)[i] * transitionMatrix[i][j] * emissionMatrix[j][(int) ob_TP1] * listBetas.get(t + 1)[j]);
@@ -158,6 +151,16 @@ public class EstiModParamExercice extends Exercice {
                 listGama.add(gama_t.clone());
             }
 
+            // Special case for gama T-1
+            double denomGama = 0;
+            for (int i = 0; i < nbStates; i++) {
+                denomGama += listAlpha.get(nbObservations - 1)[i];
+            }
+            for (int i = 0; i < nbStates; i++) {
+                gama_t[i] = listAlpha.get(nbObservations - 1)[i] / denomGama;
+            }
+            listGama.add(gama_t.clone());
+
             /////// Calcul of P(O\lambda)
             logProb = 0;
             for (int t = 0; t < nbObservations; t++) {
@@ -169,11 +172,10 @@ public class EstiModParamExercice extends Exercice {
             if (oldLogProb > logProb || iters == iterMax) {
                 Matrix.printMatrix(transitionMatrix);
                 Matrix.printMatrix(emissionMatrix);
-                
+
                 if (iters == iterMax) {
                     System.err.println("No convergence, step value " + iters);
-                }
-                else {
+                } else {
                     System.err.println(" Convergence, step value " + iters);
                 }
                 break;
@@ -204,7 +206,7 @@ public class EstiModParamExercice extends Exercice {
                 for (int j = 0; j < nbTypeObservations; j++) {
                     numer = 0;
                     denom = 0;
-                    for (int t = 0; t < nbObservations - 1; t++) {
+                    for (int t = 0; t < nbObservations; t++) {
                         double curr_obs = observations[t][0];
                         if ((int) curr_obs == j) {
                             numer += listGama.get(t)[i];

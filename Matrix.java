@@ -70,7 +70,7 @@ public class Matrix {
         System.out.print(matrix.length + " " + matrix[0].length + " ");
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[i].length; j++) {
-                System.out.print(matrix[i][j] + " ");
+                System.err.print(matrix[i][j] + " ");
             }
 
         }
@@ -80,7 +80,7 @@ public class Matrix {
     // Display Fonction for matrix
     public static void printVector(double[] vector) {
         for (int i = 0; i < vector.length; i++) {
-            System.out.println(vector[i] + " ");
+            System.err.println(vector[i] + " ");
         }
     }
 

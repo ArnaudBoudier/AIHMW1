@@ -13,7 +13,7 @@ public class PartCQuestions78910 extends Exercice {
 
     @Override
     public void resolve() {
-        EstiModParamExercice.BaumWelchAlgorithm(data.transitionMatrix.matrix, data.emissionMatrix.matrix, data.pi.matrix, data.observations.matrix, 1000);
+        EstiModParamExercice.BaumWelchAlgorithm(data.transitionMatrix.matrix, data.emissionMatrix.matrix, data.pi.matrix, data.observations.matrix, 10000,data.nbObservations);
 
         Matrix.printMatrix(data.pi.matrix);
     }
