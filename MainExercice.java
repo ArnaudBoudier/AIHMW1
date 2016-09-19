@@ -20,7 +20,7 @@ public class MainExercice {
         // ex = new EstiModParamExercice();
         // GRADE C
         // C 1. QUESTION 7
-         ex = new PartCQuestions78910();
+        ex = new PartCQuestions78910();
         ex.resolve();
        
     }

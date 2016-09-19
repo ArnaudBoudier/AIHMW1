@@ -30,7 +30,7 @@ class Client {
             ;
 
         if (Main.gVerbose) {
-            System.err.println("Final score: " + mState.myScore());
+            //("Final score: " + mState.myScore());
         }
     }
 
@@ -95,7 +95,6 @@ class Client {
             }
         } else if (lMessageType.equals("SHOOT")) {
             // Read deadline in milliseconds
-            
 
             int lMs = Integer.parseInt(lMessage.nextToken());
             // Ask the player what to do

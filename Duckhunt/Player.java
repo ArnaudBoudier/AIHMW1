@@ -1,65 +1,46 @@
 
 import Duckhunt.HMMOfBirdSpecies;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
 class Player {
 
-    HMMOfBirdSpecies HMMPigeon;
-    HMMOfBirdSpecies HMMRaven;
-    HMMOfBirdSpecies HMMSkylark;
-    HMMOfBirdSpecies HMMSwallow;
-    HMMOfBirdSpecies HMMSnipe;
-    HMMOfBirdSpecies HMMBlackStork;
-
-    HMMOfBirdSpecies[] listHMM;
+    ArrayList<ArrayList<HMMOfBirdSpecies>> listHMMGuess;
+    ArrayList<ArrayList<HMMOfBirdSpecies>> listHMMShoot;
+    ArrayList<ArrayList<Integer>> listObsGlobal;
     int[] guess;
-
     // Parameters Initialization
-    int nbSpecies = 6;
-    int nbStates = 5;
-    int nbTypesObservations = 9;
+    int nbSpecies = Constants.COUNT_SPECIES;
+    int nbTypesObservations = Constants.COUNT_MOVE;
+    double[][] matTrans2 = {{0.47, 0.53}, {0.52, 0.48}};
+    double[][] matEmi2 = {{0.12, 0.10, 0.10, 0.10, 0.15, 0.8, 0.13, 0.12, 0.10}, {0.10, 0.15, 0.13, 0.12, 0.10, 0.8, 0.12, 0.10, 0.10}};
+    double[] matPi2 = {0.53, 0.47};
+
+    double[][] matTrans3 = {{0.37, 0.31, 0.33}, {0.32, 0.35, 0.33}, {0.35, 0.32, 0.33}};
+    double[][] matEmi3 = {{0.12, 0.10, 0.10, 0.10, 0.13, 0.10, 0.13, 0.12, 0.10}, {0.10, 0.13, 0.13, 0.12, 0.10, 0.10, 0.12, 0.10, 0.10}, {0.13, 0.12, 0.11, 0.12, 0.10, 0.10, 0.12, 0.10, 0.10}};
+    double[] matPi3 = {32, 33, 35};
+
+    double[][] matTrans4 = {{0.24, 0.26, 0.25, 0.25}, {0.25, 0.26, 0.24, 0.25}, {0.23, 0.24, 0.26, 0.27}, {0.25, 0.24, 0.25, 0.26}};
+    double[][] matEmi4 = {{0.12, 0.10, 0.10, 0.10, 0.13, 0.10, 0.13, 0.12, 0.10}, {0.10, 0.13, 0.13, 0.12, 0.10, 0.10, 0.12, 0.10, 0.10}, {0.13, 0.12, 0.11, 0.12, 0.10, 0.10, 0.12, 0.10, 0.10}, {0.13, 0.13, 0.11, 0.11, 0.10, 0.11, 0.11, 0.10, 0.10}};
+    double[] matPi4 = {0.24, 0.22, 0.26, 0.28};
 
     public Player() {
 
         // HMM Initialization
-        listHMM = new HMMOfBirdSpecies[nbSpecies];
+        listHMMGuess = new ArrayList<>();
+        for (int i = 0; i < nbSpecies; i++) {
+            listHMMGuess.add(new ArrayList<HMMOfBirdSpecies>());
+        }
+        listHMMShoot = new ArrayList<>();
+        for (int i = 0; i < nbSpecies; i++) {
+            listHMMShoot.add(new ArrayList<HMMOfBirdSpecies>());
+        }
+        listObsGlobal = new ArrayList<>();
+        for (int i = 0; i < nbSpecies; i++) {
+            listObsGlobal.add(new ArrayList<Integer>());
+        }
 
-        double[][] emmissionMatrix = emissionMatrixInit(nbStates, nbTypesObservations);
-        double[][] transitionMatrix = transitionMatrixInit(nbStates);
-        double[] piMatrix = piMatrixInit(nbStates);
-        HMMPigeon = new HMMOfBirdSpecies(transitionMatrix, emmissionMatrix, piMatrix);
-        listHMM[0] = HMMPigeon;
-
-        emmissionMatrix = emissionMatrixInit(nbStates, nbTypesObservations);
-        transitionMatrix = transitionMatrixInit(nbStates);
-        piMatrix = piMatrixInit(nbStates);
-        HMMRaven = new HMMOfBirdSpecies(transitionMatrix, emmissionMatrix, piMatrix);
-        listHMM[1] = HMMRaven;
-
-        emmissionMatrix = emissionMatrixInit(nbStates, nbTypesObservations);
-        transitionMatrix = transitionMatrixInit(nbStates);
-        piMatrix = piMatrixInit(nbStates);
-        HMMSkylark = new HMMOfBirdSpecies(transitionMatrix, emmissionMatrix, piMatrix);
-        listHMM[2] = HMMSkylark;
-
-        emmissionMatrix = emissionMatrixInit(nbStates, nbTypesObservations);
-        transitionMatrix = transitionMatrixInit(nbStates);
-        piMatrix = piMatrixInit(nbStates);
-        HMMSwallow = new HMMOfBirdSpecies(transitionMatrix, emmissionMatrix, piMatrix);
-        listHMM[3] = HMMSwallow;
-
-        emmissionMatrix = emissionMatrixInit(nbStates, nbTypesObservations);
-        transitionMatrix = transitionMatrixInit(nbStates);
-        piMatrix = piMatrixInit(nbStates);
-        HMMSnipe = new HMMOfBirdSpecies(transitionMatrix, emmissionMatrix, piMatrix);
-        listHMM[4] = HMMSnipe;
-
-        emmissionMatrix = emissionMatrixInit(nbStates, nbTypesObservations);
-        transitionMatrix = transitionMatrixInit(nbStates);
-        piMatrix = piMatrixInit(nbStates);
-        HMMBlackStork = new HMMOfBirdSpecies(transitionMatrix, emmissionMatrix, piMatrix);
-        listHMM[5] = HMMBlackStork;
     }
 
     /**
@@ -79,79 +60,140 @@ class Player {
      * pass
      */
     public Action shoot(GameState pState, Deadline pDue) {
-        guess = new int[pState.getNumBirds()];
+        int firstStepShoot = 80;
+        double ThresholdShootProb = 0.60;
+        // If we don't have seen enough datas to make a shoot with confidence we don't shoot
+        if (pState.getBird(0).getSeqLength() < firstStepShoot) {
+            return new Action(-1, -1);
+        }
+        // If this this the first round
+        if (pState.getRound() == 0) {
 
-        for (int numBird = 0; numBird < pState.getNumBirds(); numBird++) {
-            Bird bird = pState.getBird(numBird);
-            if (bird.getSeqLength() < 90) {
-                break;
-            }
+            double bestShootProb = Double.NEGATIVE_INFINITY;
+            int bestShoot = -1;
+            int idBirdToShoot = -1;
 
-            if (bird.isAlive()) {
-                // we get the information about the bird
-                double[][] observations = new double[bird.getSeqLength()][1];
-                for (int idObs = 0; idObs < bird.getSeqLength(); idObs++) {
-                    observations[idObs][0] = bird.getObservation(idObs);
-                }
+            // We are looking for the best shoot probability
+            for (int idBird = 0; idBird < pState.getNumBirds(); idBird++) {
 
-                // Search for best model wich best fit with the Informations
-                double logProb = Double.NEGATIVE_INFINITY;
-                int species = 0;
-                for (int j = 0; j < nbSpecies; j++) {
-                    double newLogProb = listHMM[j].SequenceLikelihood(observations);
-                    if (newLogProb > logProb) {
-                        logProb = newLogProb;
-                        species = j;
+                Bird currentBird = pState.getBird(idBird);
+
+                if (currentBird.isAlive()) {
+                    // we get the information about the bird
+                    double[][] observations = new double[currentBird.getSeqLength()][1];
+                    for (int idObs = 0; idObs < currentBird.getSeqLength(); idObs++) {
+                        observations[idObs][0] = currentBird.getObservation(idObs);
+                    }
+                    // We create a new HMM 
+                    HMMOfBirdSpecies newHMMOfBirdSpecies = new HMMOfBirdSpecies(transitionMatrixInit(2), emissionMatrixInit(2, nbTypesObservations), piMatrixInit(2));
+                    newHMMOfBirdSpecies.BaumWelchAlgorithm(observations, 100);
+                    // We search for the mostLikely state sequence;
+                    int[] statesSeq = newHMMOfBirdSpecies.MostLikelySequenceOfStates(observations);
+                    // We get our current State
+                    int currentState = statesSeq[statesSeq.length - 1];
+                    double[] currentPi_t = newHMMOfBirdSpecies.transitionMatrix[currentState];
+                    // We compute a vector which represent the probability of each observation to apperat at t+1
+                    double[] nextObsDist = newHMMOfBirdSpecies.NextObsDistribution(currentPi_t);
+
+                    // We search for the best shoot to do by maximizing the probability
+                    double bestLocalShootProb = Double.NEGATIVE_INFINITY;
+                    int bestLocalShoot = -1;
+                    for (int idObs = 0; idObs < Constants.COUNT_MOVE; idObs++) {
+                        if (nextObsDist[idObs] > bestLocalShootProb) {
+                            bestLocalShootProb = nextObsDist[idObs];
+                            bestLocalShoot = idObs;
+                        }
+                    }
+                    // At this moment we have the best move with the best probability for the current bird
+                    // We compare with the best shoot probability of the other birds
+                    // We don't shoot if the bird will move righ or left because it might be a black stork
+                    if (bestLocalShootProb > bestShootProb && bestLocalShoot != Constants.MOVE_RIGHT && bestLocalShoot != Constants.MOVE_LEFT) {
+                        if (bestLocalShootProb >= ThresholdShootProb) {
+                            bestShootProb = bestLocalShootProb;
+                            bestShoot = bestLocalShoot;
+                            idBirdToShoot = idBird;
+                        }
                     }
                 }
-                // If species is a black Stork we do not shoot
-                if (species == Constants.SPECIES_BLACK_STORK) {
-                    break;
-                }
 
-                // We search for the mostLikely state sequence;
-                // int[] stateSeq = listHMM[species].MostLikelySequenceOfStates(observations);
-                // int currentState = stateSeq[stateSeq.length - 1];
-                // When we have the best species we want to know the current Pi_t
-                double[] currentPi_t = listHMM[species].pi;//listHMM[species].transitionMatrix[currentState];
-                double[][] currentPi_t_Matrix = new double[1][currentPi_t.length];
+            }
+            if (idBirdToShoot != -1) {
+                System.err.println("shoot bird " + idBirdToShoot + "action " + bestShoot + " Prob " + bestShootProb);
+            }
+            return new Action(idBirdToShoot, bestShoot);
+        }// If it's not the first round
+        else {
+            double bestShootProb = Double.NEGATIVE_INFINITY;
+            int bestShoot = -1;
+            int idBirdToShoot = -1;
+            // Same thing we are looking for the best probability to shoot
+            for (int idBird = 0; idBird < pState.getNumBirds(); idBird++) {
+                Bird currentBird = pState.getBird(idBird);
 
-                currentPi_t_Matrix[0] = currentPi_t.clone();
-                for (int i = 0; i < bird.getSeqLength() - 1; i++) {
-                    currentPi_t_Matrix = listHMM[species].multiplyByMatrix(currentPi_t_Matrix, listHMM[species].transitionMatrix);
-                    System.err.println("Result t " + i);
-                    Matrix.printVector(currentPi_t_Matrix[0]);
-                }
-             
-                // We compute a vector which represent the probability of each observation to apperat at t
-                double[] nextObsDist = listHMM[species].NextObsDistribution(currentPi_t_Matrix[0]);
-
-                // We search the max of this probability
-                int index = 0;
-                double maxProb = 0;
-                int maxIndex = 0;
-                while (index < nbTypesObservations) {
-                    if (nextObsDist[index] > maxProb) {
-                        maxProb = nextObsDist[index];
-                        maxIndex = index;
+                if (currentBird.isAlive()) {
+                    double[][] observations = new double[currentBird.getSeqLength()][1];
+                    for (int idObs = 0; idObs < currentBird.getSeqLength(); idObs++) {
+                        observations[idObs][0] = currentBird.getObservation(idObs);
                     }
-                    index++;
-                }
-                //   System.err.println("Max prob " + maxProb);
-                // If prob > 0.60 we choose to shoot
-                if (maxProb >= 0.45) {
-                    guess[numBird] = species;
-                    System.err.println("shoot bird " + numBird + " action : " + maxIndex + " Prob " + maxProb);
-                    return new Action(numBird, maxIndex);
 
+                    // Now we want to find its species and its best HMM associated
+                    // To do that we just have to find the HMM which best maximize the likelihood of the observations
+                    int currentSpecies = Constants.SPECIES_UNKNOWN;
+                    double bestLikelihood = Double.NEGATIVE_INFINITY;
+                    HMMOfBirdSpecies bestHMM = null;
+                    for (int idSpecies = 0; idSpecies < Constants.COUNT_SPECIES; idSpecies++) {
+                        // We have various HMM for a same species so we look at all this HMM
+                        int nbHMM = listHMMGuess.get(idSpecies).size();
+                        for (int idHMM = 0; idHMM < nbHMM; idHMM++) {
+                            HMMOfBirdSpecies currentHMM = listHMMGuess.get(idSpecies).get(idHMM);
+                            double localLikehood = currentHMM.SequenceLikelihood(observations);
+                            if (localLikehood > bestLikelihood) {
+                                bestLikelihood = localLikehood;
+                                bestHMM = currentHMM;
+                                currentSpecies = idSpecies;
+                            }
+                        }
+                    }
+                    // At this moment we have the bestHMM which maximize the likelihood of our observations
+                    // We have also the species associated to this guess
+                    // We don't want to shoot at a black stork
+                    if (!(currentSpecies == Constants.SPECIES_BLACK_STORK) && bestLikelihood > -200) {
+                        // Now we want to find the next observation which has the best probability to appear
+                        // We search for the mostLikely state sequence;
+                        int[] statesSeq = bestHMM.MostLikelySequenceOfStates(observations);
+                        // We get our current State
+                        int currentState = statesSeq[statesSeq.length - 1];
+                        double[] currentPi_t = bestHMM.transitionMatrix[currentState];
+                        // We compute a vector which represent the probability of each observation to apperat at t+1
+                        double[] nextObsDist = bestHMM.NextObsDistribution(currentPi_t);
+
+                        // We search for the best shoot to do by maximizing the probability
+                        double bestLocalShootProb = Double.NEGATIVE_INFINITY;
+                        int bestLocalShoot = -1;
+                        for (int idObs = 0; idObs < Constants.COUNT_MOVE; idObs++) {
+                            if (nextObsDist[idObs] > bestLocalShootProb) {
+                                bestLocalShootProb = nextObsDist[idObs];
+                                bestLocalShoot = idObs;
+                            }
+                        }
+
+                        if (bestLocalShootProb > bestShootProb) {
+                            if (bestLocalShootProb >= ThresholdShootProb) {
+                                bestShootProb = bestLocalShootProb;
+                                bestShoot = bestLocalShoot;
+                                idBirdToShoot = idBird;
+                            }
+                        }
+
+                    }
                 }
             }
+            if (idBirdToShoot != -1) {
+                System.err.println("shoot bird " + idBirdToShoot + "action " + bestShoot + " Prob " + bestShootProb);
+            }
+            return new Action(idBirdToShoot, bestShoot);
         }
 
-        return cDontShoot;
-
-        // This line would predict that bird 0 will move right and shoot at it.
-        // return new Action(0, Constants.MOVE_RIGHT);
     }
 
     /**
@@ -179,28 +221,31 @@ class Player {
             species = 0;
             logProb = Double.NEGATIVE_INFINITY;
             Bird currentBird = pState.getBird(i);
-            if (currentBird.isAlive()) {
-                double[][] observations = new double[currentBird.getSeqLength()][1];
-                for (int j = 0; j < currentBird.getSeqLength(); j++) {
+
+            double[][] observations = new double[currentBird.getSeqLength()][1];
+            for (int j = 0; j < currentBird.getSeqLength(); j++) {
+                if (currentBird.wasAlive(j)) {
                     observations[j][0] = currentBird.getObservation(j);
                 }
+            }
 
-                for (int j = 0; j < 6; j++) {
-                    double newLogProb = listHMM[j].SequenceLikelihood(observations);
-                    if (newLogProb > logProb) {
+            for (int j = 0; j < nbSpecies; j++) {
+                int nbHmm = listHMMGuess.get(j).size();
+                for (int z = 0; z < nbHmm; z++) {
+                    HMMOfBirdSpecies currentHMM = listHMMGuess.get(j).get(z);
+                    double newLogProb = currentHMM.SequenceLikelihood(observations);
+                    if (newLogProb > logProb && currentHMM.isTrained()) {
                         logProb = newLogProb;
                         species = j;
                     }
                 }
-                System.err.println("Estimation for Bird number " + i + " " + speciesName(species) + " with p :" + logProb);
-                lguess[i] = species;
-                guess[i] = lguess[i];
-            } else {
-                lguess[i] = guess[i];
             }
-        }
+            System.err.println("Estimation for Bird number " + i + " " + speciesName(species) + " with p :" + logProb);
+            lguess[i] = species;
 
-        return guess;
+        }
+        guess = lguess.clone();
+        return lguess;
     }
 
     /**
@@ -212,7 +257,7 @@ class Player {
      * @param pDue time before which we must have returned
      */
     public void hit(GameState pState, int pBird, Deadline pDue) {
-        System.err.println("Bird num + " + pBird + " was hit, species hypothese : " + speciesName(guess[pBird]));
+        System.err.println("Bird num + " + pBird + " was hit");
 
     }
 
@@ -225,29 +270,44 @@ class Player {
      * @param pDue time before which we must have returned
      */
     public void reveal(GameState pState, int[] pSpecies, Deadline pDue) {
-        System.err.println("--REVELATION TIME---");
+        //("--REVELATION TIME---");
         int score = 0;
+        ArrayList<ArrayList<Integer>> listObs = new ArrayList<>();
+        for (int i = 0; i < nbSpecies; i++) {
+            listObs.add(new ArrayList<Integer>());
+        }
         for (int i = 0; i < pSpecies.length; i++) {
 
             int currentSpecies = pSpecies[i];
             if (currentSpecies == guess[i]) {
                 score++;
             }
-            if (currentSpecies < 0) {
-                break;
-            }
-            Bird currentBird = pState.getBird(i);
             System.err.println("Bird num " + i + " : " + speciesName(currentSpecies));
-            if (currentBird.isAlive()) {
+            Bird currentBird = pState.getBird(i);
 
-                double[][] observations = new double[currentBird.getSeqLength()][1];
-                for (int j = 0; j < currentBird.getSeqLength(); j++) {
-                    observations[j][0] = currentBird.getObservation(j);
+            for (int j = 0; j < currentBird.getSeqLength(); j++) {
+                if (currentBird.wasAlive(j)) {
+                    listObs.get(currentSpecies).add(currentBird.getObservation(j));
                 }
-                if (!listHMM[currentSpecies].isTrained()) {
-                    System.err.println("Train model for " + speciesName(currentSpecies) + " nb " + i);
-                    listHMM[currentSpecies].BaumWelchAlgorithm(observations, 50);
+            }
+
+        }
+        for (int i = 0; i < nbSpecies; i++) {
+            int size = listObs.get(i).size();
+            if (size >= 70) {
+          
+                double[][] observationsMatrix = new double[size][1];
+                for (int z = 0; z < size; z++) {
+                    observationsMatrix[z][0] = listObs.get(i).get(z);
                 }
+                int nbStates;
+                int nbIterations = 300;
+                nbStates = 3;
+                HMMOfBirdSpecies newHMMOfBirdSpecies = new HMMOfBirdSpecies(transitionMatrixInit(nbStates), emissionMatrixInit(nbStates, nbTypesObservations), piMatrixInit(nbStates));
+                newHMMOfBirdSpecies.BaumWelchAlgorithm(observationsMatrix, nbIterations);
+                newHMMOfBirdSpecies.setTrained(true);
+                listHMMGuess.get(i).add(newHMMOfBirdSpecies);
+
             }
         }
 
@@ -261,46 +321,77 @@ class Player {
 
     public double[][] transitionMatrixInit(int nbStates) {
         double[][] transitionMatrix = new double[nbStates][nbStates];
-        for (int i = 0; i < nbStates; i++) {
-            for (int j = 0; j < nbStates; j++) {
-                transitionMatrix[i][j] = 0.2;
-                if (j % 2 == 0 && j < nbStates - 1) {
-                    transitionMatrix[i][j] = transitionMatrix[i][j] - 0.05;
-                } else if (j % 2 != 0) {
-                    transitionMatrix[i][j] = transitionMatrix[i][j] + 0.05;
-                }
+        switch (nbStates) {
 
-            }
+            case 2:
+                transitionMatrix = matTrans2.clone();
+                for (int i = 0; i < nbStates; i++) {
+                    transitionMatrix[i] = matTrans2[i].clone();
+                }
+                break;
+            case 3:
+                transitionMatrix = matTrans3.clone();
+                for (int i = 0; i < nbStates; i++) {
+                    transitionMatrix[i] = matTrans3[i].clone();
+                }
+                break;
+            case 4:
+                transitionMatrix = matTrans4.clone();
+                for (int i = 0; i < nbStates; i++) {
+                    transitionMatrix[i] = matTrans4[i].clone();
+                }
+                break;
+
         }
         return transitionMatrix;
     }
 
     public double[][] emissionMatrixInit(int nbStates, int nbTypesObservations) {
         double[][] emissionMatrix = new double[nbStates][nbTypesObservations];
-        for (int i = 0; i < nbStates; i++) {
-            for (int j = 0; j < nbTypesObservations; j++) {
-                emissionMatrix[i][j] = 0.11111111;
-                if (j % 2 == 0 && j < nbTypesObservations - 1) {
-                    emissionMatrix[i][j] = emissionMatrix[i][j] - 0.05;
-                } else if (j % 2 != 0) {
-                    emissionMatrix[i][j] = emissionMatrix[i][j] + 0.05;
-                }
 
-            }
+        switch (nbStates) {
+
+            case 2:
+                emissionMatrix = matEmi2.clone();
+                for (int i = 0; i < nbStates; i++) {
+                    emissionMatrix[i] = matEmi2[i].clone();
+                }
+                break;
+            case 3:
+                emissionMatrix = matEmi3.clone();
+                for (int i = 0; i < nbStates; i++) {
+                    emissionMatrix[i] = matEmi3[i].clone();
+                }
+                break;
+            case 4:
+                emissionMatrix = matEmi4.clone();
+                for (int i = 0; i < nbStates; i++) {
+                    emissionMatrix[i] = matEmi4[i].clone();
+                }
+                break;
+
         }
+
         return emissionMatrix;
     }
 
     public double[] piMatrixInit(int nbStates) {
         double[] piMatrix = new double[nbStates];
-        for (int i = 0; i < nbStates; i++) {
-            piMatrix[i] = 0.2;
-            if (i % 2 == 0 && i < nbStates - 1) {
-                piMatrix[i] = piMatrix[i] - 0.05;
-            } else if (i % 2 != 0) {
-                piMatrix[i] = piMatrix[i] + 0.05;
-            }
+
+        switch (nbStates) {
+
+            case 2:
+                piMatrix = matPi2.clone();
+                break;
+            case 3:
+                piMatrix = matPi3.clone();
+                break;
+            case 4:
+                piMatrix = matPi4.clone();
+                break;
+
         }
+
         return piMatrix;
     }
 

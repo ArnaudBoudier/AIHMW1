@@ -32,6 +32,7 @@ public class InputParser {
 
         if (transitionMatcher.matches()) {
             this.nbStates = Integer.parseInt(transitionMatcher.group(1));
+            
             String transitionMatrixString = transitionMatcher.group(3);
             this.transitionMatrix = new Matrix(this.nbStates, transitionMatrixString);
         }

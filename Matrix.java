@@ -21,14 +21,13 @@ public class Matrix {
             }
         }
     }
-    
-     public Matrix(double[][] matrixValues) {
-         this.matrix = matrixValues;
-         this.nbRows = matrixValues.length;
-         this.nbCol = matrixValues[0].length;
-     }
-    
-    
+
+    public Matrix(double[][] matrixValues) {
+        this.matrix = matrixValues;
+        this.nbRows = matrixValues.length;
+        this.nbCol = matrixValues[0].length;
+    }
+
     // Matrix creation with String 
     public Matrix(int nbRows, String matrixString) {
         this.matrix = stringTodoubleMatrix(transform(matrixString.split(" "), nbRows));
@@ -55,9 +54,8 @@ public class Matrix {
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
                 try {
-                result[i][j] = Double.parseDouble(matrix[i][j]);
-                }
-                catch (Exception e){
+                    result[i][j] = Double.parseDouble(matrix[i][j]);
+                } catch (Exception e) {
                     System.out.println("");
                 }
             }
@@ -67,14 +65,14 @@ public class Matrix {
 
     // Display Fonction for matrix
     public static void printMatrix(double[][] matrix) {
-        System.out.print(matrix.length + " " + matrix[0].length + " ");
+        System.err.print(matrix.length + " " + matrix[0].length + " ");
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[i].length; j++) {
                 System.err.print(matrix[i][j] + " ");
             }
 
         }
-        System.out.println();
+        System.err.println();
     }
 
     // Display Fonction for matrix
@@ -132,6 +130,44 @@ public class Matrix {
             }
         }
         return mResult;
+    }
+
+    public static double distanceMatrixN1(double[][] m1, double[][] m2) {
+
+        double distance = 0;
+        for (int i = 0; i < m1.length; i++) {
+            for (int j = 0; j < m1[0].length; j++) {
+                distance += Math.abs(m1[i][j] - m2[i][j]);
+            }
+        }
+        return distance;
+    }
+
+    public static double distanceMatrixN2(double[][] m1, double[][] m2) {
+
+        double distance = 0;
+        for (int i = 0; i < m1.length; i++) {
+            for (int j = 0; j < m1[0].length; j++) {
+                distance += Math.pow(m1[i][j] - m2[i][j], 2);
+            }
+        }
+        return Math.sqrt(distance);
+    }
+
+    public static double distanceMatrixNInfini(double[][] m1, double[][] m2) {
+
+        double maxdistance = 0;
+        double distance = 0;
+        for (int i = 0; i < m1.length; i++) {
+            for (int j = 0; j < m1[0].length; j++) {
+                distance = Math.abs(m1[i][j] - m2[i][j]);
+               
+                if (distance > maxdistance) {
+                    maxdistance = distance;
+                }
+            }
+        }
+        return maxdistance;
     }
 
 }

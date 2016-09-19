@@ -19,10 +19,10 @@ public class EstiModParamExercice extends Exercice {
     @Override
     public void resolve() {
 
-        BaumWelchAlgorithm(data.transitionMatrix.matrix, data.emissionMatrix.matrix, data.pi.matrix, data.observations.matrix, 50,data.nbObservations);
+        BaumWelchAlgorithm(data.transitionMatrix.matrix, data.emissionMatrix.matrix, data.pi.matrix, data.observations.matrix, 1, data.nbObservations);
     }
 
-    public static void BaumWelchAlgorithm(double[][] transitionMatrix, double[][] emissionMatrix, double[][] pi, double[][] observations, int iterMax,int nbObservations) {
+    public static void BaumWelchAlgorithm(double[][] transitionMatrix, double[][] emissionMatrix, double[][] pi, double[][] observations, int iterMax, int nbObservations) {
 
         // Initialization of parameters
         int nbStates = transitionMatrix.length;
@@ -172,12 +172,20 @@ public class EstiModParamExercice extends Exercice {
             if (oldLogProb > logProb || iters == iterMax) {
                 Matrix.printMatrix(transitionMatrix);
                 Matrix.printMatrix(emissionMatrix);
-
                 if (iters == iterMax) {
-                    System.err.println("No convergence, step value " + iters);
+                    System.err.println("#Observations : " + nbObservations + " no convergence, step value " + iters);
                 } else {
-                    System.err.println(" Convergence, step value " + iters);
+                    System.err.println("#Observations : " + nbObservations + " convergence, step value " + iters);
                 }
+                /*
+                double distance = Matrix.distanceMatrixN1(pi, PartCQuestions78910.piExpected) + Matrix.distanceMatrixN1(transitionMatrix, PartCQuestions78910.transExpected) + Matrix.distanceMatrixN1(emissionMatrix, PartCQuestions78910.emmisExpected);
+                System.err.println("Distance N1 " + distance);
+                distance = Matrix.distanceMatrixN2(pi, PartCQuestions78910.piExpected) + Matrix.distanceMatrixN2(transitionMatrix, PartCQuestions78910.transExpected) + Matrix.distanceMatrixN2(emissionMatrix, PartCQuestions78910.emmisExpected);
+                System.err.println("Distance N2 " + distance);
+                distance = Matrix.distanceMatrixNInfini(pi, PartCQuestions78910.piExpected) + Matrix.distanceMatrixNInfini(transitionMatrix, PartCQuestions78910.transExpected) + Matrix.distanceMatrixNInfini(emissionMatrix, PartCQuestions78910.emmisExpected);
+                System.err.println("Distance NInfini " + distance);
+                System.err.println("");
+                */
                 break;
             }
             oldLogProb = logProb;
