@@ -7,12 +7,14 @@ import java.util.Scanner;
 class Player {
 
     ArrayList<ArrayList<HMMOfBirdSpecies>> listHMMGuess;
-    ArrayList<ArrayList<HMMOfBirdSpecies>> listHMMShoot;
-    ArrayList<ArrayList<Integer>> listObsGlobal;
+    ArrayList<ArrayList<Integer>> listObs;
+    
     int[] guess;
     // Parameters Initialization
     int nbSpecies = Constants.COUNT_SPECIES;
     int nbTypesObservations = Constants.COUNT_MOVE;
+    
+    
     double[][] matTrans2 = {{0.47, 0.53}, {0.52, 0.48}};
     double[][] matEmi2 = {{0.12, 0.10, 0.10, 0.10, 0.15, 0.8, 0.13, 0.12, 0.10}, {0.10, 0.15, 0.13, 0.12, 0.10, 0.8, 0.12, 0.10, 0.10}};
     double[] matPi2 = {0.53, 0.47};
@@ -32,15 +34,10 @@ class Player {
         for (int i = 0; i < nbSpecies; i++) {
             listHMMGuess.add(new ArrayList<HMMOfBirdSpecies>());
         }
-        listHMMShoot = new ArrayList<>();
+        listObs = new ArrayList<>();
         for (int i = 0; i < nbSpecies; i++) {
-            listHMMShoot.add(new ArrayList<HMMOfBirdSpecies>());
-        }
-        listObsGlobal = new ArrayList<>();
-        for (int i = 0; i < nbSpecies; i++) {
-            listObsGlobal.add(new ArrayList<Integer>());
-        }
-
+            listObs.add(new ArrayList<Integer>());
+        } 
     }
 
     /**
@@ -295,14 +292,16 @@ class Player {
         for (int i = 0; i < nbSpecies; i++) {
             int size = listObs.get(i).size();
             if (size >= 70) {
-          
+
                 double[][] observationsMatrix = new double[size][1];
                 for (int z = 0; z < size; z++) {
                     observationsMatrix[z][0] = listObs.get(i).get(z);
                 }
                 int nbStates;
                 int nbIterations = 300;
+
                 nbStates = 3;
+
                 HMMOfBirdSpecies newHMMOfBirdSpecies = new HMMOfBirdSpecies(transitionMatrixInit(nbStates), emissionMatrixInit(nbStates, nbTypesObservations), piMatrixInit(nbStates));
                 newHMMOfBirdSpecies.BaumWelchAlgorithm(observationsMatrix, nbIterations);
                 newHMMOfBirdSpecies.setTrained(true);
