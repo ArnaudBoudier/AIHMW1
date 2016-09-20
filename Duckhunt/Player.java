@@ -100,14 +100,11 @@ class Player {
                     // At this moment we have the bestHMM which maximize the likelihood of our observations
                     // We have also the species associated to this guess
                     // We don't want to shoot at a black stork
-                    if (!(currentSpecies == Constants.SPECIES_BLACK_STORK) && bestLikelihood > -200) {
+                    if (!(currentSpecies == Constants.SPECIES_BLACK_STORK) && bestLikelihood > -200 && bestHMM != null) {
                         // Now we want to find the next observation which has the best probability to appear
-                        // We search for the mostLikely state sequence;
-                        int[] statesSeq = bestHMM.MostLikelySequenceOfStates(observations);
-                        // We get our current State
-                        int currentState = statesSeq[statesSeq.length - 1];
-                        double[] currentPi_t = bestHMM.transitionMatrix[currentState];
-                        // We compute a vector which represent the probability of each observation to apperat at t+1
+                        // We get our current State probability vector
+                        double[] currentPi_t = bestHMM.currentStateEstimation(observations);
+// We compute a vector which represent the probability of each observation to apperat at t+1
                         double[] nextObsDist = bestHMM.NextObsDistribution(currentPi_t);
 
                         // We search for the best shoot to do by maximizing the probability
@@ -176,7 +173,7 @@ class Player {
                 if (listHMM[j] != null) {
                     HMMOfBirdSpecies currentHMM = listHMM[j];
                     double newLogProb = currentHMM.SequenceLikelihood(observations);
-                    System.err.println("Species " + speciesName(j) + " Prob = " + newLogProb);
+                    //  System.err.println("Species " + speciesName(j) + " Prob = " + newLogProb);
                     if (newLogProb > logProb) {
                         logProb = newLogProb;
                         species = j;
@@ -260,10 +257,8 @@ class Player {
                     nbStates = 2;
                 } else if (size <= 300) {
                     nbStates = 3;
-                } else if (size <= 700) {
-                    nbStates = 4;
                 } else {
-                    nbStates = 5;
+                    nbStates = 4;
                 }
 
                 HMMOfBirdSpecies newHMMOfBirdSpecies = new HMMOfBirdSpecies(transitionMatrixInit(nbStates), emissionMatrixInit(nbStates, nbTypesObservations), piMatrixInit(nbStates));
