@@ -57,7 +57,7 @@ public class HMMOfBirdSpecies {
     }
 
     // Return the probability of observe a sequence given our HMM object
-    public double SequenceLikelihood(double[][] observations) {
+    public  double SequenceLikelihood(double[][] observations) {
 
         int nbObservations = observations.length;
         ArrayList<double[]> listAlpha = new ArrayList<>();

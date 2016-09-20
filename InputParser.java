@@ -19,6 +19,9 @@ public class InputParser {
     public int nbObservations = 0;
     public Matrix observations;
 
+    public int nbValidationObservations = 0;
+    public Matrix validationobservations;
+
 //    private String transitionMatrixString = "";
     public InputParser(Scanner input) {
 
@@ -32,7 +35,7 @@ public class InputParser {
 
         if (transitionMatcher.matches()) {
             this.nbStates = Integer.parseInt(transitionMatcher.group(1));
-            
+
             String transitionMatrixString = transitionMatcher.group(3);
             this.transitionMatrix = new Matrix(this.nbStates, transitionMatrixString);
         }
@@ -73,6 +76,18 @@ public class InputParser {
             String observationsMatrixString = observationMatcher.group(2);
             this.observations = new Matrix(1, observationsMatrixString);
         }
+        observationLine = input.nextLine();
+
+        Pattern patternValidObs = Pattern.compile("(\\d+) (.*)");
+        Matcher validObservationMatcher = patternValidObs.matcher(observationLine);
+
+        if (validObservationMatcher.matches()) {
+            System.out.println("MATCH");
+            this.nbValidationObservations = Integer.parseInt(validObservationMatcher.group(1));
+            String validobservationsMatrixString = validObservationMatcher.group(2);
+            this.validationobservations = new Matrix(1, validobservationsMatrixString);
+        }
+
     }
 
     public InputParser(Scanner input, double[][] transitionMatrix, double[][] emissionMatrix, double[] pi, int nbStates, int nbTypeObservations) {

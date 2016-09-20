@@ -174,9 +174,12 @@ public class EstiModParamExercice extends Exercice {
                 Matrix.printMatrix(emissionMatrix);
                 if (iters == iterMax) {
                     System.err.println("#Observations : " + nbObservations + " no convergence, step value " + iters);
+                    System.out.println(" Likelilihood " + logProb);
                 } else {
                     System.err.println("#Observations : " + nbObservations + " convergence, step value " + iters);
+                    System.out.println(" Likelilihood " + oldLogProb);
                 }
+
                 /*
                 double distance = Matrix.distanceMatrixN1(pi, PartCQuestions78910.piExpected) + Matrix.distanceMatrixN1(transitionMatrix, PartCQuestions78910.transExpected) + Matrix.distanceMatrixN1(emissionMatrix, PartCQuestions78910.emmisExpected);
                 System.err.println("Distance N1 " + distance);
@@ -185,7 +188,7 @@ public class EstiModParamExercice extends Exercice {
                 distance = Matrix.distanceMatrixNInfini(pi, PartCQuestions78910.piExpected) + Matrix.distanceMatrixNInfini(transitionMatrix, PartCQuestions78910.transExpected) + Matrix.distanceMatrixNInfini(emissionMatrix, PartCQuestions78910.emmisExpected);
                 System.err.println("Distance NInfini " + distance);
                 System.err.println("");
-                */
+                 */
                 break;
             }
             oldLogProb = logProb;

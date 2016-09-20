@@ -30,7 +30,7 @@ class Client {
             ;
 
         if (Main.gVerbose) {
-            //("Final score: " + mState.myScore());
+            System.err.println("Final score: " + mState.myScore());
         }
     }
 
